@@ -1,3 +1,114 @@
-<div class="relative bg-white text-black">
-  <div class="flex justify-center mx-auto px-4 sm:px-6">HEADER</div>
+<div class="relative bg-white text-black" x-data="{mobileMenuOpen: false}">
+  <div class="flex justify-center mx-auto px-4 sm:px-6">
+    <!-- STORE NAME / SOTRE LOGO -->
+    <div class="flex justify-start lg:flex-1 truncate">
+      <h1 class="text-xl font-bold truncate">{{shop.name}}</h1>
+    </div>
+    <div class="md:hidden">
+      <button x-on:click="mobileMenuOpen = true" type="button">
+        {% render 'icon-menu' %}
+      </button>
+      
+    </div>
+    <!-- NAVIGATION MENU -->
+    <nav class="hidden md:flex space-x-10">
+      {% for link in section.settings.menu.links %} <!-- "menu" = setting id -->
+        {% if link.links != blank %}
+        {% assign link_handle = link.handle | replace: '-', '_'%}
+          <div class="relative" x-data="{ {{link_handle}}: false }">
+            <button x-on:click="{{link_handle}} = !{{link_handle}}" class="inline-flex items-center">
+              {{link.title}}
+              {% render 'icon-dropdown' %}
+            </button>
+            <div class="absolute z-10 bg-white p-2" 
+            x-show="{{link_handle}}" 
+            @click.away="{{link_handle}} = false"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-10"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-out duration-300"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-10"
+            >
+              <div class="shadow-lg">
+                {% for childlink in link.links %}
+                  <a href="{{ childlink.url}}" class="flex">
+                    <p>{{childlink.title}}</p>
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+        <a href="{{link.url}}">{{link.title}}</a>
+        {% endif %}
+      {% endfor %}
+        </nav>
+    <!-- CARD BUTTON / ACCOUNT LINKS IF ENABLED -->
+    <div class="hidden md:flex items-center justify-end md:flex-1 space-x-5">
+      <a href="/cart" class="whitespace-nowrap text-base text-gray-500 hover:text-gray-900">
+        {% render 'icon-shopping-bag' %}
+      </a>
+      {% if shop.customer_accounts_enable %}
+        {% if customer %}
+          <a href="/account">account</a>
+          {{ 'log out' | customer_logout_link }}
+        {% else %}
+          {{ 'log in' | customer_login_link }}
+          {{ "register" | customer_register_link }}
+        {% endif %}
+      {% endif %}
+    </div>
+    <!-- MOBILE MENU CONTAINER -->
+    <div x-show="mobileMenuOpen"  class="absolute top-10 z-10 inset-x-0 p-2 md:hidden text-white">
+      <h2>{{section.settings.mobile_menu_title}}</h2>
+      <button type="button" x-on:click="mobileMenuOpen = false">
+        {% render 'icon-close' %}
+      </button>
+      <div class="pt-3">
+        <nav class="grid gap-y-7">
+          {% for link in section.settings.menu.links %}
+            {% if link.links != blank%}  <!-- IF LINK HAS LINKS (CHECK IF THERE ARE LEVEL2 LINKS) -->
+            {% assign mobile_link_handle = link.handle | replace: '-', '_'%}  
+            <div class="relative" x-data="{ {{mobile_link_handle}}: false }">
+                <button type="button" x-on:click="{{mobile_link_handle}} = ! {{mobile_link_handle}}">
+                  {{ link.title }}
+                  {% render 'icon-dropdown' %}
+                  <p>{{ mobile_link_handle }}</p>
+                </button>
+                <div x-show="{{ mobile_link_handle }}" class="grid">
+                  {% for childLink in link.links %}
+                    <a href="{{ childLink.url }}">{{ childLink.title }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            {% else %}
+              <a href="{{ link.url }}">{{ link.title }}</a>    
+            {% endif %}
+            
+          {% endfor %}
+        </nav>
+      </div>
+    </div>
+  </div>
 </div>
+
+{% schema %}
+{
+  "name":"Header",
+  "settings": [
+  {
+   "type": "text",
+   "id": "mobile_menu_title",
+  "default": "Menu",
+   "label": "Mobile menu title"
+  },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Heading Navigation Menu"
+    }
+  ]
+}
+{% endschema %}
