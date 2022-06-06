@@ -1,3 +1,10 @@
+<!-- {% if section.settings.menu.links == blank %}
+{% assign main_menu_links = linklists[section.settings.menu].links %}
+{% else %}
+  {% assign main_menu_links = section.settings.menu.links %}
+
+{% endif %} -->
+
 <div class="relative bg-white text-black" x-data="{mobileMenuOpen: false}">
   <div class="flex justify-center mx-auto px-4 sm:px-6">
     <!-- STORE NAME / SOTRE LOGO -->
@@ -10,9 +17,10 @@
       </button>
       
     </div>
+    {% assign main_menu_links = section.settings.menu.links %}
     <!-- NAVIGATION MENU -->
     <nav class="hidden md:flex space-x-10">
-      {% for link in section.settings.menu.links %} <!-- "menu" = setting id -->
+      {% for link in main_menu_links %} <!-- "menu" = setting id -->
         {% if link.links != blank %}
         {% assign link_handle = link.handle | replace: '-', '_'%}
           <div class="relative" x-data="{ {{link_handle}}: false }">
@@ -67,7 +75,7 @@
       </button>
       <div class="pt-3">
         <nav class="grid gap-y-7">
-          {% for link in section.settings.menu.links %}
+          {% for link in main_menu_links %}
             {% if link.links != blank%}  <!-- IF LINK HAS LINKS (CHECK IF THERE ARE LEVEL2 LINKS) -->
             {% assign mobile_link_handle = link.handle | replace: '-', '_'%}  
             <div class="relative" x-data="{ {{mobile_link_handle}}: false }">

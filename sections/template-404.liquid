@@ -1,0 +1,41 @@
+<h1>{{ section.settings.title}}</h1>
+<h1>{{ section.settings.subtitle}}</h1>
+{% if section.settings.home_url == blank %}
+  {% assign shop_url = shop.secure_url %}
+{% else %}
+  {% assign shop_url = section.settings.home_url %}
+{% endif %}
+<a href="{{ shop_url }}">{{section.settings.home_text}}</a>
+
+{% schema %}
+{
+ "name": "template 404",
+"tag": "article",
+"class": "flex justify-center items-center flex-col h-screen",
+"settings": [
+  {
+    "type": "text",
+    "id": "title",
+    "default": "404",
+    "label": "404 title"
+  },
+  {
+    "type": "text",
+    "id": "subtitle",
+    "default": "The page you were looking for does not exist",
+    "label": "404 subtitle"
+  },
+  {
+   "type": "text",
+   "id":"home_text",
+   "default": "Home",
+   "label":"Home button text"
+  },
+  {
+   "type": "url",
+   "id": "home_url",
+   "label": "Home url"
+  }
+]
+}
+{% endschema %}
